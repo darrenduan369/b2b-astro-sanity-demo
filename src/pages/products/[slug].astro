@@ -1,0 +1,33 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { products } from '../../data/products';
+import type { Product } from '../../types/product';
+
+export function getStaticPaths() {
+  return products.map((product) => ({
+    params: {
+      slug: product.slug,
+    },
+    props: {
+      product,
+    },
+  }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+---
+
+<Layout
+  title={`${product.name} | BrightTech Industrial`}
+  description={`Learn more about ${product.name}, category: ${product.category}.`}
+>
+  <h1>{product.name}</h1>
+
+  <p>Category: {product.category}</p>
+
+  <p>Price: ${product.price}</p>
+</Layout>

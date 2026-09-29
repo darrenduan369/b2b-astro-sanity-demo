@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { products } from '../data/products';
+---
+
+<Layout
+  title="Industrial Products | BrightTech Industrial"
+  description="Explore our industrial lighting and electronics products for global buyers."
+>
+  <h1>Products</h1>
+
+  {
+    products.map((product) => (
+      <ProductCard product={product} />
+    ))
+  }
+</Layout>
