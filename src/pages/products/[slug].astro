@@ -25,9 +25,88 @@ const { product } = Astro.props;
   title={`${product.name} | BrightTech Industrial`}
   description={`Learn more about ${product.name}, category: ${product.category}.`}
 >
-  <h1>{product.name}</h1>
+  <section class="product-detail">
+    <div class="container product-detail__grid">
+      <div class="product-detail__media">
+        <div class="product-placeholder">
+          Product Image
+        </div>
+      </div>
 
-  <p>Category: {product.category}</p>
+      <div class="product-detail__content">
+        <p class="product-category">
+          {product.category}
+        </p>
 
-  <p>Price: ${product.price}</p>
+        <h1>{product.name}</h1>
+
+        <p class="product-price">
+          ${product.price}
+        </p>
+
+        <p class="product-description">
+          Reliable industrial product for global buyers.
+          Contact us for specifications, MOQ, lead time,
+          and quotation details.
+        </p>
+
+        <a class="button-primary" href="/contact">
+          Request a Quote
+        </a>
+      </div>
+    </div>
+  </section>
 </Layout>
+
+<style>
+  .product-detail {
+    padding: 64px 0;
+  }
+
+  .product-detail__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+    .product-placeholder {
+      min-height: 420px;
+      display: grid;
+      place-items: center;
+      background: var(--color-surface-muted);
+      border-radius: var(--radius-lg);
+    }
+
+  .product-category {
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+  }
+
+  .product-price {
+    margin: 24px 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .product-description {
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 800px) {
+    .product-detail__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .product-placeholder {
+      min-height: 280px;
+    }
+  }
+</style>

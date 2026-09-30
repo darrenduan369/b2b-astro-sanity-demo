@@ -1,12 +1,95 @@
-<header>
-  <nav>
-    <a href="/">BrightTech Industrial</a>
+---
+const currentPath = Astro.url.pathname;
+---
 
-    <div>
-      <a href="/">Home</a>
-      <a href="/products">Products</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-    </div>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      BrightTech Industrial
+    </a>
+
+  <nav class="nav">
+    <a
+      href="/"
+      class:list={{ active: currentPath === '/' }}
+    >
+      Home
+    </a>
+
+    <a
+      href="/products"
+      class:list={{
+        active: currentPath.startsWith('/products'),
+      }}
+    >
+      Products
+    </a>
+
+    <a
+      href="/about"
+      class:list={{ active: currentPath === '/about' }}
+    >
+      About
+    </a>
+
+    <a
+      href="/contact"
+      class:list={{ active: currentPath === '/contact' }}
+    >
+      Contact
+    </a>
   </nav>
+  </div>
 </header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .header-inner {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .nav {
+    display: flex;
+    gap: 24px;
+  }
+
+  .nav a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .header-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px 0;
+      gap: 12px;
+    }
+
+    .nav {
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+    }
+  }
+
+  .nav a {
+    padding-bottom: 4px;
+  }
+
+  .nav a.active {
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-text);
+  }
+</style>

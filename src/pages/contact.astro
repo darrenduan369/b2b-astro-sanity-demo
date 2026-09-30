@@ -1,0 +1,240 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Contact Us | BrightTech Industrial"
+  description="Contact BrightTech Industrial for product inquiries, quotations, and sourcing support."
+>
+  <section class="section">
+    <div class="container contact-layout">
+      <div class="contact-intro">
+        <p class="eyebrow">Contact</p>
+
+        <h1>Request a Quote</h1>
+
+        <p>
+          Tell us what product you are looking for. We will get back to you with
+          pricing, lead time, MOQ, and sourcing details.
+        </p>
+      </div>
+
+      <form id="inquiry-form" class="inquiry-form">
+        <div class="form-field">
+          <label for="name">Name *</label>
+          <input id="name" name="name" type="text" required />
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email *</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+
+        <div class="form-field">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" />
+        </div>
+
+        <div class="form-field">
+          <label for="country">Country</label>
+          <input id="country" name="country" type="text" />
+        </div>
+
+        <div class="form-field">
+          <label for="quantity">Quantity</label>
+          <input id="quantity" name="quantity" type="number" min="1" />
+        </div>
+
+        <div class="form-field">
+          <label for="message">Message *</label>
+
+          <textarea id="message" name="message" rows="6" required></textarea>
+        </div>
+
+        <button id="submit-button" class="button-primary" type="submit">
+          Send Inquiry
+        </button>
+
+        <p id="form-message" class="form-message" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .contact-intro h1 {
+    margin-top: 0;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .inquiry-form {
+    display: grid;
+    gap: 20px;
+  }
+
+  .form-field {
+    display: grid;
+    gap: 8px;
+  }
+
+  .form-field label {
+    font-weight: 600;
+  }
+
+  .form-field input,
+  .form-field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font: inherit;
+  }
+
+  .form-field textarea {
+    resize: vertical;
+  }
+
+  @media (max-width: 800px) {
+    .contact-layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  .form-message {
+    min-height: 24px;
+    margin: 0;
+    color: var(--color-muted);
+  }
+</style>
+
+<script>
+  import type {
+    CreateInquiryInput,
+    SubmitInquiryResponse,
+  } from "../types/inquiry";
+  import { validateInquiry } from "../validators/inquiryValidator";
+  import { mapFormDataToInquiry } from "../mappers/inquiryMapper";
+  import type { RequestState } from "../types/requestState";
+  import { submitInquiry } from "../services/inquiryService";
+
+  const form = document.querySelector<HTMLFormElement>("#inquiry-form");
+
+  const messageElement =
+    document.querySelector<HTMLParagraphElement>("#form-message");
+
+  const submitButton =
+    document.querySelector<HTMLButtonElement>("#submit-button");
+
+  let state: RequestState<SubmitInquiryResponse> = {
+    status: "idle",
+  };
+
+  function renderState(state: RequestState<SubmitInquiryResponse>) {
+    if (!messageElement) {
+      return;
+    }
+
+    switch (state.status) {
+      case "idle":
+        messageElement.textContent = "";
+        break;
+
+      case "loading":
+        messageElement.textContent = "Sending inquiry...";
+        break;
+
+      case "success":
+        messageElement.textContent = `Inquiry submitted successfully. ID: ${state.data.inquiryId}`;
+        break;
+
+      case "error":
+        messageElement.textContent = state.message;
+        break;
+    }
+
+    if (submitButton) {
+      submitButton.disabled = state.status === "loading";
+
+      submitButton.textContent =
+        state.status === "loading" ? "Sending..." : "Send Inquiry";
+    }
+  }
+
+  if (form && messageElement) {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (state.status === "loading") {
+        return;
+      }
+
+      state = {
+        status: "loading",
+      };
+
+      renderState(state);
+
+      const formData = new FormData(form);
+
+      const inquiry = mapFormDataToInquiry(formData);
+
+      const validationResult = validateInquiry(inquiry);
+
+      if (!validationResult.ok) {
+        state = {
+          status: "error",
+          message: validationResult.error.message,
+        };
+
+        renderState(state);
+
+        const fieldElement = form.elements.namedItem(
+          validationResult.error.field,
+        );
+
+        if (fieldElement instanceof HTMLElement) {
+          fieldElement.focus();
+        }
+
+        return;
+      }
+
+      state = {
+        status: "loading",
+      };
+
+      renderState(state);
+
+      const submitResult = await submitInquiry(validationResult.data);
+
+      if (!submitResult.ok) {
+        state = {
+          status: "error",
+          message: submitResult.error.message,
+        };
+
+        renderState(state);
+        return;
+      }
+
+      state = {
+        status: "success",
+        data: submitResult.data,
+      };
+
+      renderState(state);
+
+      form.reset();
+
+      console.log("Inquiry ID:", submitResult.data.inquiryId);
+    });
+  }
+</script>

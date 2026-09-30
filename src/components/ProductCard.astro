@@ -8,13 +8,62 @@ interface Props {
 const { product } = Astro.props;
 ---
 
-<article>
-  <h2>
-    <a href={`/products/${product.slug}`}>
-      {product.name}
-    </a>
-  </h2>
+<article class="product-card">
+  <div class="product-card__body">
+    <p class="product-card__category">
+      {product.category}
+    </p>
 
-  <p>{product.category}</p>
-  <p>${product.price}</p>
+    <h2 class="product-card__title">
+      <a href={`/products/${product.slug}`}>
+        {product.name}
+      </a>
+    </h2>
+
+    <p class="product-card__price">
+      ${product.price}
+    </p>
+
+    <a
+      class="product-card__link"
+      href={`/products/${product.slug}`}
+    >
+      View Details →
+    </a>
+  </div>
 </article>
+
+<style>
+  .product-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  }
+
+  .product-card__body {
+    padding: 24px;
+  }
+
+  .product-card__category {
+    margin: 0 0 8px;
+    font-size: 0.875rem;
+  }
+
+  .product-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .product-card__title a:hover {
+    text-decoration: underline;
+  }
+
+  .product-card__price {
+    margin: 20px 0;
+    font-weight: 700;
+  }
+
+  .product-card__link {
+    text-decoration: underline;
+  }
+</style>

@@ -7,6 +7,7 @@ export const products: Product[] = [
     name: 'Industrial LED High Bay Light',
     category: 'Lighting',
     price: 89.99,
+    featured: true,
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ export const products: Product[] = [
     name: 'Outdoor Solar Flood Light',
     category: 'Lighting',
     price: 59.99,
+    featured: false,
   },
   {
     id: 3,
@@ -21,5 +23,6 @@ export const products: Product[] = [
     name: 'Portable Bluetooth Speaker',
     category: 'Electronics',
     price: 28,
+    featured: true,
   },
 ];

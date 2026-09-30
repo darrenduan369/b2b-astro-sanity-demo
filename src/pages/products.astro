@@ -6,13 +6,59 @@ import { products } from '../data/products';
 
 <Layout
   title="Industrial Products | BrightTech Industrial"
-  description="Explore our industrial lighting and electronics products for global buyers."
+  description="Explore our industrial products for global buyers."
 >
-  <h1>Products</h1>
+  <section class="products-section">
+    <div class="container">
+      <div class="products-heading">
+        <p>Our Products</p>
+        <h1>Industrial Products</h1>
+      </div>
 
-  {
-    products.map((product) => (
-      <ProductCard product={product} />
-    ))
-  }
+      <div class="product-grid">
+        {
+          products.map((product) => (
+            <ProductCard product={product} />
+          ))
+        }
+      </div>
+    </div>
+  </section>
 </Layout>
+
+<style>
+  .products-section {
+    padding: 64px 0;
+  }
+
+  .products-heading {
+    margin-bottom: 32px;
+  }
+
+  .products-heading p {
+    margin: 0 0 8px;
+  }
+
+  .products-heading h1 {
+    margin: 0;
+    font-size: 2.5rem;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
