@@ -1,11 +1,9 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ProductCard from '../components/ProductCard.astro';
-import { products } from '../data/products';
+import Layout from "../layouts/Layout.astro";
+import ProductCard from "../components/ProductCard.astro";
+import { fetchFeaturedProducts } from "../services/productService";
 
-const featuredProducts = products.filter(
-  (product) => product.featured,
-);
+const featuredProducts = await fetchFeaturedProducts();
 ---
 
 <Layout
@@ -16,49 +14,36 @@ const featuredProducts = products.filter(
     <div class="container hero-inner">
       <p class="eyebrow">Global B2B Supplier</p>
 
-      <h1>
-        Reliable Industrial Products for Global Buyers
-      </h1>
+      <h1>Reliable Industrial Products for Global Buyers</h1>
 
       <p class="hero-description">
-        We help international buyers source reliable industrial
-        products from China with clear communication and efficient
-        delivery.
+        We help international buyers source reliable industrial products from
+        China with clear communication and efficient delivery.
       </p>
 
       <div class="hero-actions">
-        <a class="button-primary" href="/products">
-          View Products
-        </a>
-        <a class="text-link" href="/contact">
-          Contact Us
-        </a>
+        <a class="button-primary" href="/products"> View Products </a>
+        <a class="text-link" href="/contact"> Contact Us </a>
       </div>
     </div>
   </section>
 
   <section class="featured-products">
-  <div class="container">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">Featured Products</p>
-        <h2>Popular Products</h2>
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Featured Products</p>
+          <h2>Popular Products</h2>
+        </div>
+
+        <a href="/products"> View All Products → </a>
       </div>
 
-      <a href="/products">
-        View All Products →
-      </a>
+      <div class="product-grid">
+        {featuredProducts.map((product) => <ProductCard product={product} />)}
+      </div>
     </div>
-
-    <div class="product-grid">
-      {
-        featuredProducts.map((product) => (
-          <ProductCard product={product} />
-        ))
-      }
-    </div>
-  </div>
-</section>
+  </section>
 </Layout>
 
 <style>
@@ -99,42 +84,42 @@ const featuredProducts = products.filter(
   }
 
   .featured-products {
-  padding: 64px 0 96px;
-}
-
-.section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 24px;
-  margin-bottom: 32px;
-}
-
-.section-heading h2 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-@media (max-width: 900px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 64px 0 96px;
   }
-}
 
-@media (max-width: 640px) {
   .section-heading {
-    align-items: flex-start;
-    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 2rem;
   }
 
   .product-grid {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
   }
-}
+
+  @media (max-width: 900px) {
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .product-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>

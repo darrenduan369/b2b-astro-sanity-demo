@@ -1,5 +1,5 @@
 ---
-import type { Product } from '../types/product';
+import type { Product } from "../types/product";
 
 interface Props {
   product: Product;
@@ -24,10 +24,19 @@ const { product } = Astro.props;
       ${product.price}
     </p>
 
-    <a
-      class="product-card__link"
-      href={`/products/${product.slug}`}
-    >
+    {
+      product.imageUrl ? (
+        <img
+          class="product-card__image"
+          src={product.imageUrl}
+          alt={product.imageAlt ?? product.name}
+          loading="lazy"
+        />
+      ) : (
+        <div class="product-card__placeholder">No image</div>
+      )
+    }
+    <a class="product-card__link" href={`/products/${product.slug}`}>
       View Details →
     </a>
   </div>
@@ -35,9 +44,9 @@ const { product } = Astro.props;
 
 <style>
   .product-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
   }
 
   .product-card__body {
@@ -65,5 +74,27 @@ const { product } = Astro.props;
 
   .product-card__link {
     text-decoration: underline;
+  }
+
+  .product-card__image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .product-card__placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-md);
+  }
+
+  .product-card__image {
+    display: block;
+    object-fit: cover;
+  }
+
+  .product-card__placeholder {
+    display: grid;
+    place-items: center;
+    background: var(--color-surface-muted);
   }
 </style>

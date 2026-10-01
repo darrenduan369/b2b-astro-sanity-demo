@@ -1,7 +1,7 @@
-export interface Product {
-  id: string;
-  slug: string;
+export interface SanityProduct {
+  _id: string;
   name: string;
+  slug: string;
   category: string;
   price: number;
   featured: boolean;

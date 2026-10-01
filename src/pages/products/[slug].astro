@@ -1,24 +1,32 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { products } from '../../data/products';
-import type { Product } from '../../types/product';
+import Layout from "../../layouts/Layout.astro";
+import type { Product } from "../../types/product";
+import {
+  fetchProducts,
+  fetchProductBySlug,
+} from "../../services/productService";
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const products = await fetchProducts();
+
   return products.map((product) => ({
     params: {
       slug: product.slug,
     },
-    props: {
-      product,
-    },
   }));
 }
 
-interface Props {
-  product: Product;
+const { slug } = Astro.params;
+
+if (!slug) {
+  throw new Error("Product slug is missing");
 }
 
-const { product } = Astro.props;
+const product = await fetchProductBySlug(slug);
+
+if (!product) {
+  throw new Error(`Product ${slug} not found`);
+}
 ---
 
 <Layout
@@ -27,10 +35,18 @@ const { product } = Astro.props;
 >
   <section class="product-detail">
     <div class="container product-detail__grid">
-      <div class="product-detail__media">
-        <div class="product-placeholder">
-          Product Image
-        </div>
+      <div class="product-media">
+        {
+          product.imageUrl ? (
+            <img
+              class="product-image"
+              src={product.imageUrl}
+              alt={product.name}
+            />
+          ) : (
+            <div class="product-placeholder">No product image</div>
+          )
+        }
       </div>
 
       <div class="product-detail__content">
@@ -45,14 +61,11 @@ const { product } = Astro.props;
         </p>
 
         <p class="product-description">
-          Reliable industrial product for global buyers.
-          Contact us for specifications, MOQ, lead time,
-          and quotation details.
+          Reliable industrial product for global buyers. Contact us for
+          specifications, MOQ, lead time, and quotation details.
         </p>
 
-        <a class="button-primary" href="/contact">
-          Request a Quote
-        </a>
+        <a class="button-primary" href="/contact"> Request a Quote </a>
       </div>
     </div>
   </section>
@@ -70,13 +83,13 @@ const { product } = Astro.props;
     align-items: center;
   }
 
-    .product-placeholder {
-      min-height: 420px;
-      display: grid;
-      place-items: center;
-      background: var(--color-surface-muted);
-      border-radius: var(--radius-lg);
-    }
+  .product-placeholder {
+    min-height: 420px;
+    display: grid;
+    place-items: center;
+    background: var(--color-surface-muted);
+    border-radius: var(--radius-lg);
+  }
 
   .product-category {
     margin: 0 0 12px;
@@ -107,6 +120,13 @@ const { product } = Astro.props;
 
     .product-placeholder {
       min-height: 280px;
+    }
+
+    .product-image {
+      width: 100%;
+      min-height: 420px;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
     }
   }
 </style>

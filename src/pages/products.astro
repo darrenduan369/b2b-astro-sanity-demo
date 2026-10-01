@@ -1,7 +1,9 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ProductCard from '../components/ProductCard.astro';
-import { products } from '../data/products';
+import Layout from "../layouts/Layout.astro";
+import ProductCard from "../components/ProductCard.astro";
+import { fetchProducts } from "../services/productService";
+
+const products = await fetchProducts();
 ---
 
 <Layout
@@ -16,11 +18,7 @@ import { products } from '../data/products';
       </div>
 
       <div class="product-grid">
-        {
-          products.map((product) => (
-            <ProductCard product={product} />
-          ))
-        }
+        {products.map((product) => <ProductCard product={product} />)}
       </div>
     </div>
   </section>
