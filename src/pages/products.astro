@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import ProductCard from "../components/ProductCard.astro";
 import { fetchProducts } from "../services/productService";
+import AiProductAdvisor from "../components/AiProductAdvisor.astro";
 
 const products = await fetchProducts();
 
@@ -25,6 +26,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
       </div>
     </div>
   </section>
+
+  <AiProductAdvisor />
 </Layout>
 
 <style>

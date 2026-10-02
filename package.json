@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
+    "@google/genai": "^2.26.0",
     "@sanity/client": "^8.9.0",
-    "astro": "^7.3.5"
+    "astro": "^7.3.5",
+    "openai": "^7.27.0"
   },
   "allowScripts": {
     "esbuild": true

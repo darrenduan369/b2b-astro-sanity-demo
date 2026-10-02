@@ -1,0 +1,293 @@
+<section class="ai-advisor">
+  <div class="container">
+    <div class="ai-advisor__content">
+      <p class="ai-advisor__eyebrow">AI Product Advisor</p>
+
+      <h2>Not sure which product fits your needs?</h2>
+
+      <p>
+        Tell us what you are looking for and let our AI assistant suggest a
+        suitable product.
+      </p>
+
+      <form id="ai-advisor-form">
+        <textarea
+          id="ai-message"
+          name="message"
+          rows="4"
+          maxlength="300"
+          placeholder="Describe one product need, e.g. I need lighting for a warehouse."
+          required></textarea>
+
+        <p class="ai-advisor__hint">
+          Please describe one product need at a time.
+        </p>
+
+        <button id="ai-submit-button" type="submit">
+          Get Recommendation
+        </button>
+      </form>
+
+      <div id="ai-result" hidden>
+        <p id="ai-result-status"></p>
+
+        <div id="ai-result-card" hidden>
+          <p class="ai-result-label">Recommended Product</p>
+          <h3 id="ai-result-name"></h3>
+          <p id="ai-result-reason"></p>
+          <a id="ai-result-link" href="#"> View Product → </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector("#ai-advisor-form");
+  const messageInput = document.querySelector("#ai-message");
+  const submitButton = document.querySelector("#ai-submit-button");
+
+  const result = document.querySelector("#ai-result");
+  const status = document.querySelector("#ai-result-status");
+  const card = document.querySelector("#ai-result-card");
+
+  const productName = document.querySelector("#ai-result-name");
+  const productReason = document.querySelector("#ai-result-reason");
+  const productLink = document.querySelector("#ai-result-link");
+
+  if (
+    form instanceof HTMLFormElement &&
+    messageInput instanceof HTMLTextAreaElement &&
+    submitButton instanceof HTMLButtonElement &&
+    result instanceof HTMLDivElement &&
+    status instanceof HTMLParagraphElement &&
+    card instanceof HTMLDivElement &&
+    productName instanceof HTMLHeadingElement &&
+    productReason instanceof HTMLParagraphElement &&
+    productLink instanceof HTMLAnchorElement
+  ) {
+    const resultCard = card;
+    const resultProductName = productName;
+    const resultProductReason = productReason;
+    const resultProductLink = productLink;
+    const resultSubmitButton = submitButton;
+
+    function resetRecommendation() {
+      resultCard.hidden = true;
+
+      resultProductName.textContent = "";
+      resultProductReason.textContent = "";
+
+      resultProductLink.removeAttribute("href");
+    }
+
+    function setLoading(isLoading: boolean) {
+      resultSubmitButton.disabled = isLoading;
+
+      resultSubmitButton.textContent = isLoading
+        ? "Finding..."
+        : "Get Recommendation";
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        return;
+      }
+      setLoading(true);
+
+      result.hidden = false;
+
+      resetRecommendation();
+
+      status.textContent = "Finding a suitable product...";
+
+      try {
+        const response = await fetch("/api/ai-assistant", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+
+          throw new Error(
+            typeof errorData.error === "string"
+              ? errorData.error
+              : "UNKNOWN_ERROR",
+          );
+        }
+
+        const data = await response.json();
+        const recommendation = data.recommendation;
+
+        if (
+          !recommendation ||
+          typeof recommendation.productSlug !== "string" ||
+          typeof recommendation.productName !== "string" ||
+          typeof recommendation.reason !== "string"
+        ) {
+          throw new Error("Invalid recommendation response");
+        }
+
+        if (
+          recommendation.productSlug.trim() === "" ||
+          recommendation.productName.trim() === ""
+        ) {
+          resetRecommendation();
+
+          status.textContent =
+            "No suitable product was found in the current catalog.";
+
+          return;
+        }
+
+        status.textContent = "";
+
+        resultProductName.textContent = recommendation.productName;
+        resultProductReason.textContent = recommendation.reason;
+
+        resultProductLink.href = `/products/${encodeURIComponent(recommendation.productSlug)}`;
+
+        resultCard.hidden = false;
+      } catch (error) {
+        console.error(error);
+
+        resetRecommendation();
+
+        const errorCode =
+          error instanceof Error ? error.message : "UNKNOWN_ERROR";
+
+        switch (errorCode) {
+          case "TIMEOUT":
+            status.textContent =
+              "The AI service is taking too long. Please try again.";
+            break;
+
+          case "RATE_LIMIT":
+            status.textContent =
+              "The AI service is busy. Please try again shortly.";
+            break;
+
+          case "QUOTA_ERROR":
+            status.textContent =
+              "The AI recommendation service is temporarily unavailable.";
+            break;
+
+          default:
+            status.textContent =
+              "Sorry, we could not generate a recommendation right now.";
+        }
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+</script>
+
+<style>
+  .ai-advisor {
+    padding: 64px 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .ai-advisor__content {
+    max-width: 720px;
+  }
+
+  .ai-advisor__eyebrow {
+    margin-bottom: 8px;
+    color: var(--color-muted);
+  }
+
+  .ai-advisor h2 {
+    margin-bottom: 16px;
+    font-size: 36px;
+  }
+
+  #ai-advisor-form {
+    display: grid;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  #ai-message {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font: inherit;
+    resize: vertical;
+  }
+
+  #ai-advisor-form button {
+    width: fit-content;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--color-text);
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  #ai-result {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  #ai-result h3 {
+    margin-bottom: 8px;
+  }
+
+  #ai-result-status {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  #ai-result-card {
+    display: grid;
+    gap: 12px;
+  }
+
+  .ai-result-label {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 14px;
+  }
+
+  #ai-result-name {
+    margin: 0;
+    font-size: 24px;
+  }
+
+  #ai-result-reason {
+    margin: 0;
+  }
+
+  #ai-result-link {
+    width: fit-content;
+    font-weight: 600;
+  }
+
+  #ai-result-card[hidden] {
+    display: none;
+  }
+
+  #ai-submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>
