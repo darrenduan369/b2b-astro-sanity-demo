@@ -1,10 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
 <Layout
   title="Contact Us | BrightTech Industrial"
-  description="Contact BrightTech Industrial for product inquiries, quotations, and sourcing support."
+  description="Contact BrightTech Industrial for product sourcing, quotations, MOQ and lead time information."
+  canonical={canonical}
 >
   <section class="section">
     <div class="container contact-layout">

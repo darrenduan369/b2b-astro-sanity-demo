@@ -27,11 +27,48 @@ const product = await fetchProductBySlug(slug);
 if (!product) {
   throw new Error(`Product ${slug} not found`);
 }
+
+const pageTitle =
+  product.seoTitle?.trim() || `${product.name} | BrightTech Industrial`;
+
+const pageDescription =
+  product.seoDescription?.trim() ||
+  product.description ||
+  `Learn more about ${product.name} from BrightTech Industrial.`;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+
+const productStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: product.name,
+  description: pageDescription,
+  image: product.imageUrl ? [product.imageUrl] : undefined,
+  category: product.category,
+  brand: {
+    "@type": "Brand",
+    name: "BrightTech Industrial",
+  },
+  offers: {
+    "@type": "Offer",
+    url: canonical,
+    priceCurrency: "USD",
+    price: product.price,
+    availability: "https://schema.org/InStock",
+  },
+};
 ---
 
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(productStructuredData)}
+/>
+
 <Layout
-  title={`${product.name} | BrightTech Industrial`}
-  description={`Learn more about ${product.name}, category: ${product.category}.`}
+  title={pageTitle}
+  description={pageDescription}
+  canonical={canonical}
+  image={product.imageUrl}
 >
   <section class="product-detail">
     <div class="container product-detail__grid">

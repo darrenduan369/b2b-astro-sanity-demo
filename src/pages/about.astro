@@ -1,10 +1,13 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
 <Layout
   title="About Us | BrightTech Industrial"
-  description="Learn more about BrightTech Industrial and our B2B sourcing services."
+  description="Learn about BrightTech Industrial and our B2B sourcing services."
+  canonical={canonical}
 >
   <section class="section">
     <div class="container">
@@ -13,9 +16,9 @@ import Layout from '../layouts/Layout.astro';
       <h1>Reliable Sourcing for Global Buyers</h1>
 
       <p>
-        BrightTech Industrial helps international buyers source
-        reliable industrial products from China with clear
-        communication and efficient coordination.
+        BrightTech Industrial helps international buyers source reliable
+        industrial products from China with clear communication and efficient
+        coordination.
       </p>
     </div>
   </section>

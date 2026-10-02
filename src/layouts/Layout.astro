@@ -1,43 +1,82 @@
 ---
-import '../styles/global.css';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
 interface Props {
   title: string;
   description?: string;
+  canonical?: string;
+  image?: string;
 }
 
 const {
   title,
-  description = 'Reliable industrial products for global buyers.',
+  description = "Reliable industrial products for global buyers.",
+  canonical,
+  image,
 } = Astro.props;
+
+const organizationStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "BrightTech Industrial",
+  url: Astro.site?.toString(),
+};
+
+const websiteStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "BrightTech Industrial",
+  url: Astro.site?.toString(),
+};
 ---
 
 <!doctype html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
 
-    <meta
-      name="viewport"
-      content="width=device-width"
-    />
+    <meta name="viewport" content="width=device-width" />
+
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+
+    <meta name="description" content={description} />
+
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <meta property="og:title" content={title} />
+
+    <meta property="og:description" content={description} />
+
+    <meta property="og:type" content="website" />
+
+    {canonical && <meta property="og:url" content={canonical} />}
+
+    {image && <meta property="og:image" content={image} />}
 
     <meta
-      name="generator"
-      content={Astro.generator}
+      name="twitter:card"
+      content={image ? "summary_large_image" : "summary"}
     />
 
-    <title>BrightTech Industrial</title>
+    <meta name="twitter:title" content={title} />
 
-	<title>{title}</title>
+    <meta name="twitter:description" content={description} />
 
-	<meta
-	name="description"
-	content={description}
-	/>
+    {image && <meta name="twitter:image" content={image} />}
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationStructuredData)}
+    />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteStructuredData)}
+    />
   </head>
 
   <body>

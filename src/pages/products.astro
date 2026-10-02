@@ -4,11 +4,14 @@ import ProductCard from "../components/ProductCard.astro";
 import { fetchProducts } from "../services/productService";
 
 const products = await fetchProducts();
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
 <Layout
   title="Industrial Products | BrightTech Industrial"
-  description="Explore our industrial products for global buyers."
+  description="Explore industrial products for global B2B buyers."
+  canonical={canonical}
 >
   <section class="products-section">
     <div class="container">
