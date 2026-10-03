@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://brighttech-demo.example.com/sitemap-index.xml
+Sitemap: https://b2b-astro-sanity-demo.vercel.app/sitemap-index.xml
