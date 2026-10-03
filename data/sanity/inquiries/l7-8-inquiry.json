@@ -1,0 +1,15 @@
+{
+  "_type": "inquiry",
+  "name": "L7.8 Test Buyer",
+  "email": "l78@example.com",
+  "company": "Demo Trading Ltd",
+  "country": "Canada",
+  "productName": "Industrial LED High Bay Light",
+  "productSlug": "industrial-led-high-bay-light",
+  "quantity": 300,
+  "message": "Please send quotation, MOQ and delivery time.",
+  "status": "new",
+  "createdAt": "2026-10-03T10:00:00.000Z",
+  "updatedAt": "2026-10-03T10:00:00.000Z",
+  "notes": "Created for L7.8 inquiry model verification."
+}

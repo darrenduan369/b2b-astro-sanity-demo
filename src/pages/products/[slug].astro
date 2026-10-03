@@ -1,6 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import type { Product } from "../../types/product";
 import {
   fetchProducts,
   fetchProductBySlug,
@@ -102,7 +101,13 @@ const productStructuredData = {
           specifications, MOQ, lead time, and quotation details.
         </p>
 
-        <a class="button-primary" href="/contact"> Request a Quote </a>
+        <a
+          class="quote-button"
+          href={`/contact?productName=${encodeURIComponent(product.name)}
+          &productSlug=${encodeURIComponent(product.slug)}`}
+        >
+          Request Quote
+        </a>
       </div>
     </div>
   </section>
@@ -148,6 +153,32 @@ const productStructuredData = {
   .product-description {
     max-width: 560px;
     line-height: 1.7;
+  }
+
+  .quote-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 12px;
+    padding: 14px 24px;
+
+    background: #111827;
+    color: #ffffff;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+    text-decoration: none;
+
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .quote-button:hover {
+    background: #1f2937;
+    transform: translateY(-1px);
   }
 
   @media (max-width: 800px) {

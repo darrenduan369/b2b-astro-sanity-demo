@@ -16,10 +16,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
         <h1>Request a Quote</h1>
 
-        <p>
+        <p id="inquiry-description">
           Tell us what product you are looking for. We will get back to you with
           pricing, lead time, MOQ, and sourcing details.
         </p>
+      </div>
+
+      <div id="selected-product" class="selected-product" hidden>
+        <span class="selected-product__label"> Product Inquiry </span>
+
+        <strong id="selected-product-name"></strong>
       </div>
 
       <form id="inquiry-form" class="inquiry-form">
@@ -59,6 +65,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
         </button>
 
         <p id="form-message" class="form-message" aria-live="polite"></p>
+
+        <input type="hidden" id="product-name" name="productName" />
+
+        <input type="hidden" id="product-slug" name="productSlug" />
       </form>
     </div>
   </section>
@@ -116,6 +126,29 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
     margin: 0;
     color: var(--color-muted);
   }
+
+  .selected-product {
+    margin-bottom: 24px;
+    padding: 16px 18px;
+
+    background: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+
+  .selected-product__label {
+    display: block;
+    margin-bottom: 6px;
+
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .selected-product strong {
+    font-size: 1rem;
+  }
 </style>
 
 <script>
@@ -126,8 +159,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   import { validateInquiry } from "../validators/inquiryValidator";
   import { mapFormDataToInquiry } from "../mappers/inquiryMapper";
   import type { RequestState } from "../types/requestState";
-  import { submitInquiry } from "../services/inquiryService";
 
+  // 1. DOM 初始化
   const form = document.querySelector<HTMLFormElement>("#inquiry-form");
 
   const messageElement =
@@ -136,9 +169,51 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
   const submitButton =
     document.querySelector<HTMLButtonElement>("#submit-button");
 
+  const productNameInput =
+    document.querySelector<HTMLInputElement>("#product-name");
+
+  const productSlugInput =
+    document.querySelector<HTMLInputElement>("#product-slug");
+
+  const selectedProductElement =
+    document.querySelector<HTMLDivElement>("#selected-product");
+
+  const selectedProductNameElement = document.querySelector<HTMLElement>(
+    "#selected-product-name",
+  );
+
+  const inquiryDescriptionElement =
+    document.querySelector<HTMLParagraphElement>("#inquiry-description");
+
+  // 2. 页面状态初始化
   let state: RequestState<SubmitInquiryResponse> = {
     status: "idle",
   };
+
+  // 3. 读取 URL 中的产品上下文
+  if (productNameInput && productSlugInput) {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    productNameInput.value = searchParams.get("productName") ?? "";
+
+    productSlugInput.value = searchParams.get("productSlug") ?? "";
+  }
+
+  // 4. 显示当前询问产品
+  if (
+    selectedProductElement &&
+    selectedProductNameElement &&
+    productNameInput?.value
+  ) {
+    selectedProductElement.hidden = false;
+
+    selectedProductNameElement.textContent = productNameInput.value;
+  }
+
+  if (inquiryDescriptionElement && productNameInput?.value) {
+    inquiryDescriptionElement.textContent =
+      "Tell us your quantity and requirements. We'll get back to you with pricing, MOQ, lead time, and shipping details.";
+  }
 
   function renderState(state: RequestState<SubmitInquiryResponse>) {
     if (!messageElement) {
@@ -155,7 +230,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
         break;
 
       case "success":
-        messageElement.textContent = `Inquiry submitted successfully. ID: ${state.data.inquiryId}`;
+        messageElement.textContent =
+          "Inquiry submitted successfully. We will get back to you soon.";
         break;
 
       case "error":
@@ -216,12 +292,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
       renderState(state);
 
-      const submitResult = await submitInquiry(validationResult.data);
+      const response = await fetch("/api/inquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(validationResult.data),
+      });
 
-      if (!submitResult.ok) {
+      const result = await response.json();
+
+      if (!response.ok) {
         state = {
           status: "error",
-          message: submitResult.error.message,
+          message: result.message ?? "Failed to submit inquiry.",
         };
 
         renderState(state);
@@ -230,14 +314,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
       state = {
         status: "success",
-        data: submitResult.data,
+        data: {
+          inquiryId: result.inquiryId,
+        },
       };
 
       renderState(state);
 
       form.reset();
 
-      console.log("Inquiry ID:", submitResult.data.inquiryId);
+      console.log("Inquiry ID:", result.inquiryId);
     });
   }
 </script>

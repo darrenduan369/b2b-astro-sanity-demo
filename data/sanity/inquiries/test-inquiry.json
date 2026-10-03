@@ -1,0 +1,13 @@
+{
+  "_type": "inquiry",
+  "name": "Test Buyer",
+  "email": "buyer@example.com",
+  "company": "ABC Trading",
+  "country": "United States",
+  "productName": "Industrial LED High Bay Light",
+  "productSlug": "industrial-led-high-bay-light",
+  "quantity": 100,
+  "message": "Please provide quotation, MOQ and lead time.",
+  "status": "new",
+  "createdAt": "2026-10-03T08:00:00.000Z"
+}
